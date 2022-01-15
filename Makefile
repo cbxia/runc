@@ -1,3 +1,4 @@
+# [[Stand GNU Make makefile, cf: https://opensource.com/article/18/8/what-how-makefile]]
 CONTAINER_ENGINE := docker
 GO ?= go
 
@@ -22,6 +23,8 @@ ifeq ($(shell $(GO) env GOOS),linux)
 endif
 GO_BUILD := $(GO) build -trimpath $(GO_BUILDMODE) $(EXTRA_FLAGS) -tags "$(BUILDTAGS)" \
 	-ldflags "-X main.gitCommit=$(COMMIT) -X main.version=$(VERSION) $(EXTRA_LDFLAGS)"
+#[[-ldflags (linker flags) is the arguement used with the go build command to insert dynamic information into the binary at build time, without the need for source code modification. cf: https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications ]]	
+	
 GO_BUILD_STATIC := CGO_ENABLED=1 $(GO) build -trimpath $(EXTRA_FLAGS) -tags "$(BUILDTAGS) netgo osusergo" \
 	-ldflags "-extldflags -static -X main.gitCommit=$(COMMIT) -X main.version=$(VERSION) $(EXTRA_LDFLAGS)"
 
