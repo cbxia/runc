@@ -19,6 +19,7 @@ import (
 
 // version must be set from the contents of VERSION file by go build's
 // -X main.version= option in the Makefile.
+//[[See comment in Makefile to understand how build-time substution works.]]
 var version = "unknown"
 
 // gitCommit will be the hash that the binary was built from
@@ -70,10 +71,12 @@ func main() {
 		v = append(v, fmt.Sprintf("libseccomp: %d.%d.%d", major, minor, micro))
 	}
 	app.Version = strings.Join(v, "\n")
+	//[[Very similar to how StringBuilder is used to concatenate multiple strings.]]
 
 	xdgRuntimeDir := ""
 	root := "/run/runc"
-	if shouldHonorXDGRuntimeDir() {
+	if shouldHonorXDGRuntimeDir() { //[[Basically this says: if we're not root, since we have no access to "/run/runc", we have to be based under "($XDG_RUNTIME_DIR)/runc"]]
+		//[[$XDG_RUNTIME_DIR defines the base directory relative to which user-specific non-essential runtime files and other file objects (such as sockets, named pipes, ...) should be stored. The directory MUST be owned by the user, and he MUST be the only one having read and write access to it. Its Unix access mode MUST be 0700. cf: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html#variables]]
 		if runtimeDir := os.Getenv("XDG_RUNTIME_DIR"); runtimeDir != "" {
 			root = runtimeDir + "/runc"
 			xdgRuntimeDir = root
